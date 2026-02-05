@@ -24,6 +24,7 @@ import { User } from "@/db/schema"
 const formSchema = z.object({
   username: z.string().min(2, "Minimum 2 caractères").max(50),
   email: z.string().email("Email invalide"),
+  password: z.string().min(6, "Le mot de passe doit faire au moins 6 caractères"), 
 });
 
 interface UserFormProps {
@@ -40,29 +41,24 @@ export default function UserForm() {
     defaultValues: {
       username: "",
       email: "",
-    },
+      password: "",
+      },
   });
 
   // 3. Soumission
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsPending(true);
     try {
-      // On prépare les données pour Drizzle
-      // Note: on ajoute le password ici car il est requis par ton schema.ts
-      await createUser({
-        username: values.username,
-        email: values.email,
-        password: "password_temporaire_123", 
-      });
+      // On envoie maintenant les "values" qui contiennent le password
+      await createUser(values); 
       
       form.reset();
-      alert("Utilisateur créé !");
+      alert("Utilisateur créé avec succès !");
       router.refresh();
     } catch (error) {
       console.error("Erreur d'informaticien :", error);
       alert("Erreur lors de la création.");
     } finally {
-        
       setIsPending(false);
     }
   }
@@ -93,6 +89,19 @@ export default function UserForm() {
                 <FormLabel>Email</FormLabel>
                 <FormControl>
                   <Input placeholder="junior@example.com" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Mot de passe</FormLabel>
+                <FormControl>
+                  <Input type="password" placeholder="******" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
