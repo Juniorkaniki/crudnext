@@ -23,6 +23,7 @@ export async function createUser(user: Omit<User, 'id' | 'createdAt' | 'updatedA
         const newUser = await db.insert(users)
             .values(user)
             .returning(); // Renvoie un tableau avec l'utilisateur créé
+            revalidatePath("/");
         return newUser[0];
     } catch (error) {
         console.error("failed to create user", error);

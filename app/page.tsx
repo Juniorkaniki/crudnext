@@ -12,6 +12,9 @@ import {
 } from "@/components/ui/dialog"
 import UserForm from "@/components/forms/user-form";
 
+export const dynamic = "force-dynamic";
+
+
 export default async function Home() {
      
   
