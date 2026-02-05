@@ -1,7 +1,12 @@
-import UserTable from "@/components/user-table";
-import { getUsers } from "@/server/users";
-import { User, UserPlus } from "lucide-react";
-import{ Button} from "@/components/ui/button";
+"use client";
+
+import { useState } from "react";
+import { loginUser } from "@/server/auth";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { UserPlus, Loader2 } from "lucide-react";
+
+// Imports pour le Dialog et le CRUD
 import {
   Dialog,
   DialogContent,
@@ -9,48 +14,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import UserForm from "@/components/forms/user-form";
-
-export const dynamic = "force-dynamic";
-
-
-export default async function Home() {
-     
-  
-  return (
-    <div className="flex flex-col gap-4 max-w-7xl mx-auto p-4 md:p-24"> 
-      <h1 className="text-2xl font-bold">Users list </h1>
-      <div className="flex justify-end">
-<Dialog>
-  <DialogTrigger asChild>
-    <Button className="btn btn-primary">Add User <UserPlus className="size-4"/></Button>
-  </DialogTrigger>
-  <DialogContent>
-    <DialogHeader>
-      <DialogTitle>Are new user</DialogTitle>
-      <DialogDescription>
-        <UserForm />
-      </DialogDescription>
-    </DialogHeader>
-  </DialogContent>
-</Dialog>
-
-        
-      </div>
-      <UserTable />
-    </div>
-  );
-}
-
-/*
-"use client";
-
-import { useState } from "react";
-import { loginUser } from "@/server/auth";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import UserForm from "@/components/UserForm";
+import UserTable from "@/components/user-table";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -64,33 +30,59 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
 
-    const res = await loginUser(email, password);
+    try {
+      const res = await loginUser(email, password);
 
-    if (res?.error) {
-      setError(res.error);
+      if (res?.error) {
+        setError(res.error);
+        setLoading(false);
+        return;
+      }
+
+      // ✅ LOGIN OK
+      setIsLoggedIn(true);
+    } catch (err) {
+      setError("Erreur de connexion au serveur.");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    // ✅ LOGIN OK → on affiche UserForm
-    setIsLoggedIn(true);
-    setLoading(false);
   }
 
-  // 🔥 Si connecté, on montre le CRUD User
+  // 🔥 VUE APRES LOGIN : Ton code de gestion des informaticiens
   if (isLoggedIn) {
-    return (
-      <div className="p-6">
-        <h2 className="text-xl font-semibold mb-4">Bienvenue 👋</h2>
-        <UserForm />
-      </div>
-    );
-  }
-
-  // 🔐 Sinon on montre le login
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted">
-      <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-lg space-y-4">
+    <div className="flex flex-col gap-4 max-w-7xl mx-auto p-4 md:p-24">
+      <h1 className="text-2xl font-bold">Users list</h1>
+
+      <div className="flex justify-end">
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button className="btn btn-primary">
+              Add User <UserPlus className="size-4 ml-2" />
+            </Button>
+          </DialogTrigger>
+
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add new user</DialogTitle>
+              <DialogDescription>
+                <UserForm />
+              </DialogDescription>
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <UserTable />
+    </div>
+  );
+}
+
+
+  // 🔐 VUE PAR DÉFAUT : Formulaire de connexion
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-muted/50 p-4">
+      <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-lg space-y-4 border">
         <h1 className="text-2xl font-bold text-center">Connexion</h1>
 
         <form onSubmit={handleLogin} className="space-y-4">
@@ -110,14 +102,20 @@ export default function LoginPage() {
             required
           />
 
-          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+          {error && <p className="text-red-500 text-sm text-center font-medium">{error}</p>}
 
           <Button className="w-full" disabled={loading}>
-            {loading ? "Connexion..." : "Se connecter"}
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Vérification...
+              </>
+            ) : (
+              "Se connecter"
+            )}
           </Button>
         </form>
       </div>
     </div>
   );
 }
-*/
