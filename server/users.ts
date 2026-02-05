@@ -63,8 +63,8 @@ export async function deleteUser(id: string) {
         const deletedUser = await db.delete(users).where(eq(users.id, id)).returning();
         
         // C'est cette ligne qui évite les erreurs de désynchronisation
-        revalidatePath("/nom-de-ta-page"); 
-        
+    
+        revalidatePath("/");
         return deletedUser[0];
     } catch (error) {
         console.error("Erreur serveur :", error);

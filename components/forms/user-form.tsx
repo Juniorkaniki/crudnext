@@ -18,7 +18,8 @@ import {
 import { Button } from "@/components/ui/button"
 import { createUser } from "@/server/users"
 import { User } from "@/db/schema"
-//import { useRouter } from "next/router"
+
+
 
 // 1. Schéma de validation Zod
 const formSchema = z.object({
@@ -32,7 +33,7 @@ interface UserFormProps {
 }
 
 export default function UserForm() {
-    const router = useRouter();
+  
   const [isPending, setIsPending] = useState(false);
 
   // 2. Initialisation du formulaire
@@ -44,7 +45,7 @@ export default function UserForm() {
       password: "",
       },
   });
-
+const router = useRouter();
   // 3. Soumission
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsPending(true);
