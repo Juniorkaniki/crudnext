@@ -3,6 +3,7 @@
 import { db } from "@/db/drizzle";
 import { User, users } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 
 // 1. Récupérer tous les utilisateurs
 export async function getUsers() {
@@ -44,14 +45,16 @@ export async function updateUser(id: string, user: Partial<Omit<User, "id" | "cr
 }
 
 // 4. Supprimer un utilisateur
-export async function deleteUser(id: string) { 
+export async function deleteUser(id: string) {
     try {
-        await db.delete(users)
-            .where(eq(users.id, id))
-            .returning();
+        const deletedUser = await db.delete(users).where(eq(users.id, id)).returning();
         
+        // C'est cette ligne qui évite les erreurs de désynchronisation
+        revalidatePath("/nom-de-ta-page"); 
+        
+        return deletedUser[0];
     } catch (error) {
-        console.error("failed to delete user", error);
+        console.error("Erreur serveur :", error);
         throw error;
     }
 }
