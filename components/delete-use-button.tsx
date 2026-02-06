@@ -12,23 +12,22 @@ import {
 } from "@/components/ui/dialog";
 import { deleteUser } from "@/server/users";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-
 
 interface DeleteUserButtonProps {
   userId: string;
+  onSuccess?: () => void;
 }
 
-export default function DeleteUserButton({ userId }: DeleteUserButtonProps) {
+export default function DeleteUserButton({ userId, onSuccess }: DeleteUserButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const router = useRouter();
 
   const handleDelete = async () => {
     try {
       setIsLoading(true);
       await deleteUser(userId);
-      router.refresh(); // 🔥 refresh la liste des users
+      onSuccess?.();     // 🔥 recharge la table
+      setIsOpen(false);  // 🔥 ferme la popup
     } catch (error) {
       console.error(error);
     } finally {
@@ -48,8 +47,7 @@ export default function DeleteUserButton({ userId }: DeleteUserButtonProps) {
         <DialogHeader>
           <DialogTitle>Are you absolutely sure?</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete the user
-            and remove their data from our servers.
+            This action cannot be undone. This will permanently delete the user.
           </DialogDescription>
 
           <Button
@@ -57,11 +55,7 @@ export default function DeleteUserButton({ userId }: DeleteUserButtonProps) {
             variant="destructive"
             onClick={handleDelete}
           >
-            {isLoading ? (
-              <Loader2 className="animate-spin" />
-            ) : (
-              "Delete"
-            )}
+            {isLoading ? <Loader2 className="animate-spin" /> : "Delete"}
           </Button>
         </DialogHeader>
       </DialogContent>

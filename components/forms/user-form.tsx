@@ -28,10 +28,11 @@ const formSchema = z.object({
 });
 
 interface UserFormProps {
-  user?: User; // Optionnel pour différencier création et édition
+  user?: User;
+  onSuccess?: () => void; // Optionnel pour différencier création et édition
 }
 
-export default function UserForm({user}: UserFormProps) {
+export default function UserForm({user, onSuccess}: UserFormProps) {
   
   const [isPending, setIsPending] = useState(false);
 
@@ -50,16 +51,15 @@ const router = useRouter();
     setIsPending(true);
     try {
       // On envoie maintenant les "values" qui contiennent le password
-      if(user){
-        await updateUser({
-          ...values,
-          id: user.id, // On a besoin de l'ID pour la mise à jour
-        }); 
-      } else {
-        await createUser(values);
-      } 
+      if (user) {
+  await updateUser(user.id, values); // ✅ id séparé des données
+} else {
+  await createUser(values);
+}
+
       
       form.reset();
+      if (onSuccess) onSuccess(); // 🔥 recharge la table si on est en édition
       alert("Utilisateur créé avec succès !");
       router.refresh();
     } catch (error) {

@@ -43,18 +43,34 @@ export async function createUser(
 }
 
 // 3. Mettre à jour un utilisateur
-export async function updateUser( user: Omit<User,  "createdAt" | "updatedAt">) {
-    try {
-        const updatedUser = await db.update(users)
-            .set(user)
-            .where(eq(users.id, user.id))
-            .returning();
-            revalidatePath("/");
-        return updatedUser[0];
-    } catch (error) {
-        console.error("failed to update user", error);
-        throw error;
+export async function updateUser(
+  id: string,
+  data: Partial<Omit<User, "id" | "createdAt" | "updatedAt">>
+) {
+  try {
+    let updatedData = { ...data };
+
+    // 🔐 Si on veut changer le mot de passe
+    if (data.password && data.password.trim() !== "") {
+      const hashedPassword = await bcrypt.hash(data.password, 10);
+      updatedData.password = hashedPassword;
+    } else {
+      // ❌ On évite d’écraser le password avec vide
+      delete updatedData.password;
     }
+
+    const updatedUser = await db
+      .update(users)
+      .set(updatedData)
+      .where(eq(users.id, id))
+      .returning();
+
+    revalidatePath("/");
+    return updatedUser[0];
+  } catch (error) {
+    console.error("failed to update user", error);
+    throw error;
+  }
 }
 
 // 4. Supprimer un utilisateur

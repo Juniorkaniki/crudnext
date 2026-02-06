@@ -24,7 +24,14 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+ const [isAddDialogOpen, setIsAddDialogOpen] = useState(false); // Pour fermer la modale
+  const [refreshKey, setRefreshKey] = useState(0); // Pour rafraîchir la table
 
+  const handleUserAdded = () => {
+    console.log("L'ajout a réussi !"); // Ajoute ce log pour tester
+    setIsAddDialogOpen(false); // ✅ Ferme la modale
+    setRefreshKey(prev => prev + 1); // ✅ Change la clé pour trigger le useEffect de la table
+  };
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -66,11 +73,12 @@ export default function LoginPage() {
             <DialogHeader>
               <DialogTitle>Add new user</DialogTitle>
               <DialogDescription>
-                <UserForm />
+                <UserForm onSuccess={handleUserAdded} />
               </DialogDescription>
             </DialogHeader>
           </DialogContent>
         </Dialog>
+        
       </div>
 
       <UserTable />

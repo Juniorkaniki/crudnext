@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react"; // Ajout des hooks
+import { useEffect, useState } from "react";
 import { getUsers } from "@/server/users";
 import { Button } from "@/components/ui/button";
-
 import {
   Table,
   TableBody,
@@ -16,7 +15,6 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -25,23 +23,25 @@ import { Pencil, Loader2 } from "lucide-react";
 import DeleteUserButton from "./delete-use-button";
 import UserForm from "./forms/user-form";
 
-// On retire le "async" de la fonction principale
 export default function UserTable() {
   const [users, setUsers] = useState<any[]>([]);
+  const [editingUser, setEditingUser] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // On gère la récupération des données au montage du composant
-  useEffect(() => {
-    async function loadUsers() {
-      try {
-        const data = await getUsers();
-        setUsers(data);
-      } catch (error) {
-        console.error("Erreur lors de la récupération des informaticiens", error);
-      } finally {
-        setLoading(false);
-      }
+  // Déclare loadUsers à l'extérieur du useEffect pour pouvoir l'appeler depuis d'autres fonctions
+  const loadUsers = async () => {
+    setLoading(true);
+    try {
+      const data = await getUsers();
+      setUsers(data);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des informaticiens", error);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
     loadUsers();
   }, []);
 
@@ -73,23 +73,34 @@ export default function UserTable() {
               {user.createdAt ? new Date(user.createdAt).toLocaleString() : "N/A"}
             </TableCell>
             <TableCell className="text-right flex justify-end gap-2">
-              <Dialog  >
-      <DialogTrigger asChild>
-        <Button variant="ghost" size="sm">
-          <Pencil className="size-4" />
-        </Button>
-      </DialogTrigger>
+              <Dialog
+                open={editingUser === user.id}
+                onOpenChange={(open) => setEditingUser(open ? user.id : null)}
+              >
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="sm">
+                    <Pencil className="size-4" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Edit user</DialogTitle>
+                    <UserForm
+                      user={user} onSuccess={() => {
+                        setEditingUser(null);
+                        loadUsers(); // 🔄 rafraîchit la table après édition
+                      }}
+                    />
+                  </DialogHeader>
+                </DialogContent>
+              </Dialog>
 
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Edit user</DialogTitle>
-          <UserForm user={user} />
-
-        </DialogHeader>
-      </DialogContent>
-    </Dialog>
-           
-              <DeleteUserButton userId={user.id} />
+              <DeleteUserButton
+                userId={user.id}
+                onSuccess={() => {
+                  loadUsers(); // 🔄 rafraîchit la table après suppression
+                }}
+              />
             </TableCell>
           </TableRow>
         ))}
