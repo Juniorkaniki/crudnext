@@ -13,8 +13,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Pencil, Loader2 } from "lucide-react";
 import DeleteUserButton from "./delete-use-button";
+import UserForm from "./forms/user-form";
 
 // On retire le "async" de la fonction principale
 export default function UserTable() {
@@ -64,9 +73,22 @@ export default function UserTable() {
               {user.createdAt ? new Date(user.createdAt).toLocaleString() : "N/A"}
             </TableCell>
             <TableCell className="text-right flex justify-end gap-2">
-              <Button variant="ghost" size="sm">
-                <Pencil className="size-4" />
-              </Button>
+              <Dialog  >
+      <DialogTrigger asChild>
+        <Button variant="ghost" size="sm">
+          <Pencil className="size-4" />
+        </Button>
+      </DialogTrigger>
+
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Edit user</DialogTitle>
+          <UserForm user={user} />
+
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
+           
               <DeleteUserButton userId={user.id} />
             </TableCell>
           </TableRow>

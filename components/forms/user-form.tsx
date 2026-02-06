@@ -3,8 +3,9 @@
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { useState } from "react"
+import { use, useState } from "react"
 import { useRouter } from "next/navigation"
+import {  users } from "@/db/schema";
 
 import { Input } from "@/components/ui/input"
 import { 
@@ -16,10 +17,8 @@ import {
   FormMessage 
 } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
-import { createUser } from "@/server/users"
+import { createUser, updateUser } from "@/server/users"
 import { User } from "@/db/schema"
-
-
 
 // 1. Schéma de validation Zod
 const formSchema = z.object({
@@ -32,7 +31,7 @@ interface UserFormProps {
   user?: User; // Optionnel pour différencier création et édition
 }
 
-export default function UserForm() {
+export default function UserForm({user}: UserFormProps) {
   
   const [isPending, setIsPending] = useState(false);
 
@@ -40,9 +39,9 @@ export default function UserForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "",
-      email: "",
-      password: "",
+      username: user ? user.username || "" : "",
+      email: user ? user.email || "" : "",
+      password: user ? "" : "", // On ne pré-remplit pas le password en édition
       },
   });
 const router = useRouter();
@@ -51,7 +50,14 @@ const router = useRouter();
     setIsPending(true);
     try {
       // On envoie maintenant les "values" qui contiennent le password
-      await createUser(values); 
+      if(user){
+        await updateUser({
+          ...values,
+          id: user.id, // On a besoin de l'ID pour la mise à jour
+        }); 
+      } else {
+        await createUser(values);
+      } 
       
       form.reset();
       alert("Utilisateur créé avec succès !");

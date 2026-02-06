@@ -43,11 +43,11 @@ export async function createUser(
 }
 
 // 3. Mettre à jour un utilisateur
-export async function updateUser(id: string, user: Partial<Omit<User, "id" | "createdAt" | "updatedAt">>) {
+export async function updateUser( user: Omit<User,  "createdAt" | "updatedAt">) {
     try {
         const updatedUser = await db.update(users)
             .set(user)
-            .where(eq(users.id, id))
+            .where(eq(users.id, user.id))
             .returning();
             revalidatePath("/");
         return updatedUser[0];

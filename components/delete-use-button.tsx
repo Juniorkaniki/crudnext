@@ -21,6 +21,7 @@ interface DeleteUserButtonProps {
 
 export default function DeleteUserButton({ userId }: DeleteUserButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 
   const handleDelete = async () => {
@@ -36,7 +37,7 @@ export default function DeleteUserButton({ userId }: DeleteUserButtonProps) {
   };
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button variant="ghost" size="sm">
           <Trash2 className="size-4" />
