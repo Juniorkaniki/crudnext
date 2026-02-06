@@ -62,7 +62,7 @@ export default function LoginPage() {
       <h1 className="text-2xl font-bold">Users list</h1>
 
       <div className="flex justify-end">
-        <Dialog>
+        <Dialog  open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen} >
           <DialogTrigger asChild>
             <Button className="btn btn-primary">
               Add User <UserPlus className="size-4 ml-2" />
@@ -81,7 +81,7 @@ export default function LoginPage() {
         
       </div>
 
-      <UserTable />
+      <UserTable key={refreshKey} />
     </div>
   );
 }
