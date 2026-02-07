@@ -26,8 +26,8 @@ export default function DeleteUserButton({ userId, onSuccess }: DeleteUserButton
     try {
       setIsLoading(true);
       await deleteUser(userId);
-      onSuccess?.();     // 🔥 recharge la table
-      setIsOpen(false);  // 🔥 ferme la popup
+      onSuccess?.();     //  recharge la table
+      setIsOpen(false);  //  ferme la popup
     } catch (error) {
       console.error(error);
     } finally {

@@ -88,7 +88,7 @@ export default function UserTable() {
                     <UserForm
                       user={user} onSuccess={() => {
                         setEditingUser(null);
-                        loadUsers(); // 🔄 rafraîchit la table après édition
+                        loadUsers(); //  rafraîchit la table après édition
                       }}
                     />
                   </DialogHeader>
@@ -98,7 +98,7 @@ export default function UserTable() {
               <DeleteUserButton
                 userId={user.id}
                 onSuccess={() => {
-                  loadUsers(); // 🔄 rafraîchit la table après suppression
+                  loadUsers(); //  rafraîchit la table après suppression
                 }}
               />
             </TableCell>

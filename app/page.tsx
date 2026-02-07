@@ -55,7 +55,7 @@ export default function LoginPage() {
     }
   }
 
-  // 🔥 VUE APRES LOGIN : Ton code de gestion des informaticiens
+  //  VUE APRES LOGIN : Ton code de gestion des informaticiens
   if (isLoggedIn) {
   return (
     <div className="flex flex-col gap-4 max-w-7xl mx-auto p-4 md:p-24">
@@ -87,7 +87,7 @@ export default function LoginPage() {
 }
 
 
-  // 🔐 VUE PAR DÉFAUT : Formulaire de connexion
+  //  VUE PAR DÉFAUT : Formulaire de connexion
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/50 p-4">
       <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-lg space-y-4 border">
